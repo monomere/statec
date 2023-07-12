@@ -1,0 +1,38 @@
+{
+  "name": "statec",
+  "author": "monomere",
+  "version": "0.1.0",
+  "type": "module",
+	"packageManager": "npm@9.6.6",
+  "exports": {
+    "node": {
+      "module": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "default": "./dist/index.js"
+  },
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "splitting": false,
+    "sourcemap": false,
+    "clean": true,
+    "format": [
+      "cjs",
+      "esm"
+    ],
+    "dts": true
+  },
+  "scripts": {
+    "build": "tsup"
+  },
+  "devDependencies": {
+    "tsup": "^7.1.0",
+    "typescript": "^5.1.6"
+  },
+	"repository": "https://github.com/monomere/statec.git",
+  "description": "A state thing",
+  "license": "MIT"
+}

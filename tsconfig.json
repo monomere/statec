@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"strict": true,
+		"allowJs": false,
+		"checkJs": false,
+		"noImplicitAny": true,
+		"lib": ["ES2015", "DOM"]
+	}
+}
