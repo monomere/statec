@@ -28,13 +28,13 @@ const name = new BasicState("Who knows?");
 const nameElement = document.querySelector("#name");
 nameElement.textContent = name.get();
 name.effect(value => {
-	nameElement.textContent = value;
+  nameElement.textContent = value;
 });
 
 const inputElement = document.querySelector("#input");
 inputElement.value = name.get();
 inputElement.oninput = () => {
-	name.update(inputElement.value);
+  name.update(inputElement.value);
 };
 ```
 
@@ -47,7 +47,7 @@ the same as `state.get()` and the `oldValue` is the value
 that was current before the update that caused this effect happened. I should word this better.
 ```ts
 type EffectFunc<NewV, OldV = NewV> =
-	(newValue: NewV, oldValue: OldV) => void;
+  (newValue: NewV, oldValue: OldV) => void;
 ```
 
 **Example:**
@@ -61,10 +61,10 @@ someone else can.
 
 ```ts
 interface IReadonlyState<V> {
-	/** Get the current value. */
-	get(): V;
-	/** Add an effect function. */
-	effect(func: EffectFunc<V>): void;
+  /** Get the current value. */
+  get(): V;
+  /** Add an effect function. */
+  effect(func: EffectFunc<V>): void;
 }
 ```
 
@@ -79,8 +79,8 @@ transaction, which then gets used when updating.
 
 ```ts
 interface IState<V, T = V> extends IReadonlyState<V> {
-	/** Update the state with the transaction. */
-	update(trans: T): void;
+  /** Update the state with the transaction. */
+  update(trans: T): void;
 }
 ```
 
@@ -98,29 +98,29 @@ doesn't mutate the original value!*
 
 ```ts
 interface State<V, T = V> implements IState<V> {
-	constructor(
-		/** the initial value */
-		initial: V,
-		/**
-		 * The function that converts a transaction.
-		 * Note: it can be async!
-		 **/
-		handler: (trans: T, current: V) => V | Promise<V>
-	);
+  constructor(
+    /** the initial value */
+    initial: V,
+    /**
+     * The function that converts a transaction.
+     * Note: it can be async!
+     **/
+    handler: (trans: T, current: V) => V | Promise<V>
+  );
 
-	/**
-	 * Note: if the update handler is async, this will
-	 * not wait for it, use `asyncUpdate` for that instead.
-	 **/
-	update(trans: T): void;
+  /**
+   * Note: if the update handler is async, this will
+   * not wait for it, use `asyncUpdate` for that instead.
+   **/
+  update(trans: T): void;
 
-	/**
-	 * If the handler is async, await its completion.
-	 **/
-	asyncUpdate(trans: T): Promise<void>;
+  /**
+   * If the handler is async, await its completion.
+   **/
+  asyncUpdate(trans: T): Promise<void>;
 
-	get(): V;
-	effect(func: EffectFunc<V>): void;
+  get(): V;
+  effect(func: EffectFunc<V>): void;
 }
 ```
 
@@ -133,7 +133,7 @@ TODO?
 The simplest state possible. You can't update it at all.
 ```ts
 class ConstState<V> extends State<V, never> {
-	constructor(value: V);
+  constructor(value: V);
 }
 ```
 
@@ -147,7 +147,7 @@ Most useful state implementation. The transaction passed to
 the `update` function becomes the new value.
 ```ts
 class BasicState<V> extends State<V, V> {
-	constructor(value: V);
+  constructor(value: V);
 }
 ```
 
@@ -160,10 +160,10 @@ TODO
 A state for storing arrays. It's not that useful - a WIP.
 ```ts
 class ArrayState<E> extends State<
-	E[],
-	{ add: E; } | { remove: E; }
+  E[],
+  { add: E; } | { remove: E; }
 > {
-	constructor(initial: E[]);
+  constructor(initial: E[]);
 }
 ```
 
@@ -182,8 +182,8 @@ then set it in an effect function. Code duplication!
 
 ```ts
 function effectNow<V>(
-	s: IReadonlyState<V>,
-	effect: EffectFunc<V, V | undefined>
+  s: IReadonlyState<V>,
+  effect: EffectFunc<V, V | undefined>
 ): void;
 ```
 
@@ -197,13 +197,13 @@ const name = new BasicState("Who knows?");
 
 const nameElement = document.querySelector("#name");
 effectNow(name, value => {
-	nameElement.textContent = value;
+  nameElement.textContent = value;
 });
 
 const inputElement = document.querySelector("#input");
 inputElement.value = name.get();
 inputElement.oninput = () => {
-	name.update(inputElement.value);
+  name.update(inputElement.value);
 };
 ```
 
@@ -219,12 +219,12 @@ of the new dependent state gets replaced (see `BasicState`)
 
 ```ts
 function dependentState<V, U>(
-	state: IReadonlyState<V>,
-	getValue: (
-		newValue: V,
-		oldOriginalValue: V | undefined,
-		oldDependentValue: U | undefined
-	) => U
+  state: IReadonlyState<V>,
+  getValue: (
+    newValue: V,
+    oldOriginalValue: V | undefined,
+    oldDependentValue: U | undefined
+  ) => U
 ): IReadonlyState<U>;
 ```
 
@@ -232,15 +232,15 @@ function dependentState<V, U>(
 ```ts
 const original = new BasicState(42);
 const dependent = dependentState(
-	original,
-	(newValue, oldOriginalValue, oldDependentValue) => {
-		console.log(
-			"new:", newValue,
-			"old orig:", oldOriginalValue,
-			"old dep:", oldDependentValue
-		);
-		return newValue + 5;
-	}
+  original,
+  (newValue, oldOriginalValue, oldDependentValue) => {
+    console.log(
+      "new:", newValue,
+      "old orig:", oldOriginalValue,
+      "old dep:", oldDependentValue
+    );
+    return newValue + 5;
+  }
 ); // new: 42  old orig: undefined  old dep: undefined
 
 console.log(dependent.get()); // 47
@@ -269,8 +269,8 @@ outdated value forever if no more original updates happen.
 
 ```ts
 function lazyState<T>(
-	state: IReadonlyState<T>,
-	delay?: number /* = 500 */
+  state: IReadonlyState<T>,
+  delay?: number /* = 500 */
 ): IReadonlyState<T>;
 ```
 
@@ -286,7 +286,7 @@ Create a state that depends on multiple states at once.
 
 ```ts
 function joinedState<S extends IReadonlyState<any>[]>(
-	...states: S
+  ...states: S
 ): IReadonlyState<StatelessArray<S>>
 ```
 
