@@ -55,10 +55,10 @@ export class State<V, T> implements IState<V, T> {
 }
 
 /** Simplest state possible. (can't update it) */
-export class ConstState<V> extends State<V, never> {
-	constructor(value: V) {
-		super(value, (_, value) => value);
-	}
+export class ConstState<V> implements IReadonlyState<V> {
+	constructor(private value: V) {}
+	get() { return this.value; }
+	effect() {}
 }
 
 /** State where the transaction is the new value. */
@@ -105,6 +105,21 @@ export const dependentState = <V, U>(
 		dependentState.update(getValue(value, old, dependentState.get())),
 	);
 	return dependentState;
+};
+
+/**
+ * Same as {@link dependentState}, but for an async
+ * `getValue` function. (The result is awaited)
+ */
+export const asyncDependentState = async <V, U>(
+	state: IReadonlyState<V>,
+	getValue: (value: V, old: V | undefined, oldThis: U | undefined) => Promise<U>
+): Promise<IReadonlyState<U>> => {
+	const s = new BasicState(await getValue(state.get(), undefined, undefined));
+	state.effect(
+		async (value, old) => s.update(await getValue(value, old, s.get()))
+	);
+	return s;
 };
 
 /**

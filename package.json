@@ -1,7 +1,7 @@
 {
   "name": "statec",
   "author": "monomere",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
 	"packageManager": "npm@9.6.6",
   "exports": {
